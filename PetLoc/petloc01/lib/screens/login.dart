@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../navigation/app_routes.dart'; // Importação corrigida
 
 class LoginScreen extends StatelessWidget {
   @override
@@ -48,7 +49,9 @@ class LoginScreen extends StatelessWidget {
                 backgroundColor: Colors.blue[800],
                 padding: EdgeInsets.symmetric(vertical: 12, horizontal: 50),
               ),
-              onPressed: () {},
+              onPressed: () {
+                Navigator.pushReplacementNamed(context, AppRoutes.home);
+              },
               child: Text(
                 "Entrar",
                 style: TextStyle(color: Colors.white, fontSize: 18),
@@ -56,7 +59,9 @@ class LoginScreen extends StatelessWidget {
             ),
             SizedBox(height: 10),
             TextButton(
-              onPressed: () {},
+              onPressed: () {
+                // Aqui pode ser adicionado um Navigator para uma futura tela de cadastro
+              },
               child: Text(
                 "Não tem conta? Criar Conta",
                 style: TextStyle(color: Colors.white),
@@ -64,7 +69,9 @@ class LoginScreen extends StatelessWidget {
             ),
             SizedBox(height: 20),
             ElevatedButton.icon(
-              onPressed: () {},
+              onPressed: () {
+                // Aqui pode ser implementado o login com Google
+              },
               icon: Icon(Icons.login, color: Colors.white),
               label: Text("Entrar com Google"),
               style: ElevatedButton.styleFrom(
@@ -74,7 +81,9 @@ class LoginScreen extends StatelessWidget {
             ),
             SizedBox(height: 10),
             ElevatedButton.icon(
-              onPressed: () {},
+              onPressed: () {
+                // Aqui pode ser implementado o login com Facebook
+              },
               icon: Icon(Icons.facebook, color: Colors.white),
               label: Text("Entrar com Facebook"),
               style: ElevatedButton.styleFrom(

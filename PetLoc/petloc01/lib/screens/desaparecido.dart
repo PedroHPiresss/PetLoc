@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../main.dart'; // Importando a tela inicial
+import '../navigation/app_routes.dart'; // Importação corrigida
 
 class DesaparecidoScreen extends StatelessWidget {
   @override
@@ -26,13 +26,13 @@ class DesaparecidoScreen extends StatelessWidget {
         child: ListView(
           children: [
             _buildDesaparecidoCard(
-              'assets/cachorro1.jpg', // Troque pela imagem real
+              'assets/cachorro1.jpg',
               'Desaparecido',
               'Visto pela última vez no jardim aeroporto, próximo ao parquinho',
               '(19) 99999-9999',
             ),
             _buildDesaparecidoCard(
-              'assets/cachorro2.jpg', // Troque pela imagem real
+              'assets/cachorro2.jpg',
               'Desaparecido',
               'Visto pela última vez no CECAP 2, próximo ao gigantão',
               '(19) 99999-9999',
@@ -44,13 +44,21 @@ class DesaparecidoScreen extends StatelessWidget {
         backgroundColor: Colors.grey[300],
         selectedItemColor: Colors.black,
         unselectedItemColor: Colors.black,
-        currentIndex: 0, // Define qual ícone está ativo
+        currentIndex: 3, // Define a posição correta do menu
         onTap: (index) {
-          if (index == 0) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => HomeScreen()), // Volta para Home
-            );
+          switch (index) {
+            case 0:
+              Navigator.pushReplacementNamed(context, AppRoutes.home);
+              break;
+            case 1:
+              // Aqui pode ser uma futura tela de lista
+              break;
+            case 2:
+              Navigator.pushReplacementNamed(context, AppRoutes.loja);
+              break;
+            case 3:
+              // Já está na tela de desaparecidos, então nada acontece
+              break;
           }
         },
         items: [
