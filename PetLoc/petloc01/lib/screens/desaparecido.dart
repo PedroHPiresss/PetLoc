@@ -6,10 +6,10 @@ class DesaparecidoScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1A4D5F),
+        backgroundColor: const Color.fromARGB(255, 92, 151, 253),
         title: Row(
           children: [
-            Image.asset('assets/logo.png', height: 40),
+            Image.asset('assets/logo2.png', height: 40),
             SizedBox(width: 10),
             Text('PET LOC'),
           ],
@@ -26,13 +26,13 @@ class DesaparecidoScreen extends StatelessWidget {
         child: ListView(
           children: [
             _buildDesaparecidoCard(
-              'assets/cachorro1.jpg',
+              'assets/desaparecido3.jpg',
               'Desaparecido',
               'Visto pela última vez no jardim aeroporto, próximo ao parquinho',
               '(19) 99999-9999',
             ),
             _buildDesaparecidoCard(
-              'assets/cachorro2.jpg',
+              'assets/desaparecido2.webp',
               'Desaparecido',
               'Visto pela última vez no CECAP 2, próximo ao gigantão',
               '(19) 99999-9999',
