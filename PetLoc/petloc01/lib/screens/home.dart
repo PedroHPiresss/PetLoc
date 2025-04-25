@@ -57,7 +57,6 @@ class HomeScreen extends StatelessWidget {
                         ),
                       ),
                     ),
-
                     SizedBox(width: 30),
                     Column(
                       children: [
@@ -111,7 +110,15 @@ class HomeScreen extends StatelessWidget {
                     Navigator.pushNamed(context, AppRoutes.loja);
                   },
                 ),
-                _buildCard(Icons.pets, 'Meus Pets', 'Cadastre seu pet aqui!'),
+                _buildCard(
+                  Icons.pets,
+                  'Meus Pets',
+                  'Cadastre seu pet aqui!'
+                  ,
+                  onTap: () {
+                    Navigator.pushNamed(context, AppRoutes.cadastroPet);
+                  },
+                ),
                 _buildCard(
                   Icons.report,
                   'Animais Desaparecidos',
@@ -136,7 +143,7 @@ class HomeScreen extends StatelessWidget {
               // Já está na home, então não faz nada
               break;
             case 1:
-              // Adicione aqui uma tela correspondente se existir
+              Navigator.pushReplacementNamed(context, AppRoutes.criarDesaparecido);
               break;
             case 2:
               Navigator.pushReplacementNamed(context, AppRoutes.loja);

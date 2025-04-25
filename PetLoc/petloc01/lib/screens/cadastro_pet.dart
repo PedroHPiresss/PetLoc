@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import '../navigation/app_routes.dart';
 
 class CadastroPetScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: const Color.fromARGB(255, 92, 151, 253),
         title: Row(
           children: [
             Image.asset('assets/logo2.png', height: 40),
@@ -12,7 +14,6 @@ class CadastroPetScreen extends StatelessWidget {
             Text("Cadastrar PET"),
           ],
         ),
-        backgroundColor: Colors.blueAccent,
         actions: [
           IconButton(
             icon: Icon(Icons.menu),
@@ -67,11 +68,28 @@ class CadastroPetScreen extends StatelessWidget {
         backgroundColor: Colors.grey[300],
         selectedItemColor: Colors.black,
         unselectedItemColor: Colors.black,
-        items: [
+        currentIndex: 3, // Aba de "Pets" ativa
+        onTap: (index) {
+          switch (index) {
+            case 0:
+              Navigator.pushReplacementNamed(context, AppRoutes.home);
+              break;
+            case 1:
+              Navigator.pushReplacementNamed(context, AppRoutes.criarDesaparecido);
+              break;
+            case 2:
+              Navigator.pushReplacementNamed(context, AppRoutes.loja);
+              break;
+            case 3:
+              Navigator.pushReplacementNamed(context, AppRoutes.desaparecido);
+              break;
+          }
+        },
+        items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.list), label: 'Lista'),
-          BottomNavigationBarItem(icon: Icon(Icons.shopping_bag), label: 'Loja'),
-          BottomNavigationBarItem(icon: Icon(Icons.pets), label: 'Pets'),
+          BottomNavigationBarItem(icon: Icon(Icons.shopping_cart), label: 'Loja'),
+          BottomNavigationBarItem(icon: Icon(Icons.pets), label: ''),
         ],
       ),
     );

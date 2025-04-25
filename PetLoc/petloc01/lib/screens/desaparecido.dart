@@ -51,7 +51,7 @@ class DesaparecidoScreen extends StatelessWidget {
               Navigator.pushReplacementNamed(context, AppRoutes.home);
               break;
             case 1:
-              // Aqui pode ser uma futura tela de lista
+              Navigator.pushReplacementNamed(context, AppRoutes.criarDesaparecido);
               break;
             case 2:
               Navigator.pushReplacementNamed(context, AppRoutes.loja);
@@ -65,7 +65,7 @@ class DesaparecidoScreen extends StatelessWidget {
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.list), label: 'Lista'),
           BottomNavigationBarItem(icon: Icon(Icons.shopping_cart), label: 'Loja'),
-          BottomNavigationBarItem(icon: Icon(Icons.pets), label: 'Pets'),
+          BottomNavigationBarItem(icon: Icon(Icons.pets), label: 'Desaparecidos'),
         ],
       ),
     );
