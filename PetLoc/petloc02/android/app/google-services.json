@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "220287525807",
+    "firebase_url": "https://pet-loc-project-default-rtdb.firebaseio.com",
+    "project_id": "pet-loc-project",
+    "storage_bucket": "pet-loc-project.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:220287525807:android:1b192dad52a022025e855a",
+        "android_client_info": {
+          "package_name": "com.example.petloc01"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD3GKlT-LYXVAf4aInf19NDkQLABsAeUZE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
