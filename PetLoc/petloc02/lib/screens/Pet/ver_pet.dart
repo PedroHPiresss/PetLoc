@@ -1,6 +1,6 @@
+import 'dart:convert'; // Para Base64Decoder
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
-// Remova o 'as AppRoutes' aqui, pois a importação já foi corrigida
 
 class VerPetScreen extends StatelessWidget {
   final Map<String, dynamic>? petData;
@@ -17,22 +17,20 @@ class VerPetScreen extends StatelessWidget {
       );
     }
 
-    // Função para deletar o pet
     Future<void> _deletarPet() async {
       final petRef = FirebaseDatabase.instance.ref().child('pets').child(petId);
       await petRef.remove();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Perfil do pet deletado com sucesso!')),
       );
-      Navigator.pop(context); // Volta para a tela anterior
+      Navigator.pop(context);
     }
 
-    // Função para editar o pet
     Future<void> _navegarParaEditarPet() async {
       Navigator.pushNamed(
         context,
-        '/editar-pet', // Corrige a rota para a tela de edição do pet
-        arguments: petData, // Passa os dados do pet para a tela de edição
+        '/editar-pet',
+        arguments: petData,
       );
     }
 
@@ -45,9 +43,13 @@ class VerPetScreen extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            // Exibe a imagem do pet (se houver)
-            petData!['imagemPath'] != null
-                ? Image.network(petData!['imagemPath'], height: 150, width: 200)
+            petData!['imagemBase64'] != null && petData!['imagemBase64'].isNotEmpty
+                ? Image.memory(
+                    Base64Decoder().convert(petData!['imagemBase64']),
+                    height: 150,
+                    width: 200,
+                    fit: BoxFit.cover,
+                  )
                 : Icon(Icons.image, size: 100),
             SizedBox(height: 20),
             Text(
@@ -59,7 +61,6 @@ class VerPetScreen extends StatelessWidget {
             SizedBox(height: 10),
             Text('Contato: ${petData!['contato'] ?? ''}'),
             SizedBox(height: 20),
-            // Botões para editar e deletar
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [

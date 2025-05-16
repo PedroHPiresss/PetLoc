@@ -1,7 +1,51 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
-import '../navigation/app_routes.dart'; // Importação corrigida
+import 'package:firebase_database/firebase_database.dart';
+import '../navigation/app_routes.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
+  @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  final DatabaseReference _petsRef = FirebaseDatabase.instance.ref('pets');
+  List<Map<String, dynamic>> _pets = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _carregarPets();
+  }
+
+  void _carregarPets() {
+    _petsRef.onValue.listen((event) {
+      final data = event.snapshot.value;
+      if (data != null) {
+        final petsMap = Map<String, dynamic>.from(data as Map);
+        final petsList = petsMap.entries.map((entry) {
+          final petData = Map<String, dynamic>.from(entry.value);
+          return {
+            'id': entry.key,
+            'nome': petData['nome'] ?? '',
+            'descricao': petData['descricao'] ?? '',
+            'contato': petData['contato'] ?? '',
+            'imagemPath': petData['imagemPath'] ?? '',
+          };
+        }).toList();
+
+        // Limitar a 4 pets para exibir
+        setState(() {
+          _pets = petsList.take(4).toList();
+        });
+      } else {
+        setState(() {
+          _pets = [];
+        });
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -18,6 +62,7 @@ class HomeScreen extends StatelessWidget {
       ),
       body: Column(
         children: [
+          // Faixa azul fixa
           Container(
             padding: EdgeInsets.all(20),
             decoration: BoxDecoration(
@@ -40,55 +85,85 @@ class HomeScreen extends StatelessWidget {
                   style: TextStyle(fontSize: 20, color: Colors.white70),
                 ),
                 SizedBox(height: 30),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pushNamed(context, AppRoutes.cadastroPet);
-                      },
-                      child: CircleAvatar(
-                        backgroundColor: Colors.white,
-                        radius: 40,
-                        child: Icon(
-                          Icons.add,
-                          color: Colors.blueAccent,
-                          size: 40,
+
+                // Linha horizontal com as miniaturas dos pets + botão adicionar
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      // Botão de adicionar pet
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.pushNamed(context, AppRoutes.cadastroPet);
+                        },
+                        child: CircleAvatar(
+                          backgroundColor: Colors.white,
+                          radius: 40,
+                          child: Icon(
+                            Icons.add,
+                            color: Colors.blueAccent,
+                            size: 40,
+                          ),
                         ),
                       ),
-                    ),
-                    SizedBox(width: 30),
-                    Column(
-                      children: [
-                        CircleAvatar(
-                          backgroundImage: AssetImage('assets/arya.webp'),
-                          radius: 40,
-                        ),
-                        Text(
-                          'Arya',
-                          style: TextStyle(color: Colors.white, fontSize: 16),
-                        ),
-                      ],
-                    ),
-                    SizedBox(width: 30),
-                    Column(
-                      children: [
-                        CircleAvatar(
-                          backgroundImage: AssetImage('assets/leo.jpg'),
-                          radius: 40,
-                        ),
-                        Text(
-                          'Leo',
-                          style: TextStyle(color: Colors.white, fontSize: 16),
-                        ),
-                      ],
-                    ),
-                  ],
+
+                      SizedBox(width: 20),
+
+                      // Miniaturas dos pets cadastrados
+                      ..._pets.map((pet) {
+                        // Decodifica a imagem base64
+                        final String base64Str = pet['imagemPath'] ?? '';
+                        Widget avatar;
+
+                        if (base64Str.isNotEmpty) {
+                          try {
+                            final decodedBytes = base64Decode(base64Str);
+                            avatar = CircleAvatar(
+                              radius: 40,
+                              backgroundImage: MemoryImage(decodedBytes),
+                            );
+                          } catch (e) {
+                            // Se falhar no decode, exibe um ícone padrão
+                            avatar = CircleAvatar(
+                              radius: 40,
+                              child: Icon(Icons.pets, size: 40),
+                            );
+                          }
+                        } else {
+                          avatar = CircleAvatar(
+                            radius: 40,
+                            child: Icon(Icons.pets, size: 40),
+                          );
+                        }
+
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          child: Column(
+                            children: [
+                              avatar,
+                              SizedBox(height: 6),
+                              SizedBox(
+                                width: 80,
+                                child: Text(
+                                  pet['nome'],
+                                  style: TextStyle(color: Colors.white, fontSize: 16),
+                                  overflow: TextOverflow.ellipsis,
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                    ],
+                  ),
                 ),
               ],
             ),
           ),
+
           SizedBox(height: 50),
+
           Expanded(
             child: GridView.count(
               crossAxisCount: 2,
@@ -113,8 +188,7 @@ class HomeScreen extends StatelessWidget {
                 _buildCard(
                   Icons.pets,
                   'Meus Pets',
-                  'Cadastre seu pet aqui!'
-                  ,
+                  'Cadastre seu pet aqui!',
                   onTap: () {
                     Navigator.pushNamed(context, AppRoutes.menuPet);
                   },
@@ -136,11 +210,11 @@ class HomeScreen extends StatelessWidget {
         backgroundColor: Colors.grey,
         selectedItemColor: Colors.black,
         unselectedItemColor: Colors.black,
-        currentIndex: 0, // Home está ativa
+        currentIndex: 0,
         onTap: (index) {
           switch (index) {
             case 0:
-              // Já está na home, então não faz nada
+              // Já na home
               break;
             case 1:
               Navigator.pushReplacementNamed(context, AppRoutes.criarDesaparecido);
@@ -156,10 +230,7 @@ class HomeScreen extends StatelessWidget {
         items: [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.list), label: 'Lista'),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_cart),
-            label: 'Loja',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.shopping_cart), label: 'Loja'),
           BottomNavigationBarItem(icon: Icon(Icons.pets), label: 'Pets'),
         ],
       ),

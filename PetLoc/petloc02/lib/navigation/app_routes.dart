@@ -1,21 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:petloc01/screens/cadastro.dart';
+import 'package:petloc01/screens/cadastro/login/cadastro.dart';
 
 // Importando as telas
 import '../screens/home.dart';
-import '../screens/login.dart';
-import '../screens/loja.dart';
-import '../screens/desaparecido.dart';
-import '../screens/cadastro_pet.dart';
-import '../screens/criar_desaparecido.dart';
-import '../screens/menu_pet.dart'; // <- Novo
-import '../screens/ver_pet.dart';  // <- Novo
-import '../screens/editar_pet.dart'; // <- Novo
+import '../screens/cadastro/login/login.dart';
+import '../screens/loja/loja.dart';
+import '../screens/loja/cadastro_loja.dart';    // nova tela cadastro loja
+import '../screens/loja/comprar_loja.dart';     // nova tela comprar loja
+import '../screens/Desaparecidos/desaparecido.dart';
+import '../screens/Desaparecidos/criar_desaparecido.dart';
+import '../screens/Pet/cadastro_pet.dart';
+import '../screens/Pet/menu_pet.dart'; // <- Novo
+import '../screens/Pet/ver_pet.dart';  // <- Novo
+import '../screens/Pet/editar_pet.dart'; // <- Novo
 
 class AppRoutes {
   static const String home = '/home';
   static const String login = '/login';
   static const String loja = '/loja';
+  static const String cadastroLoja = '/cadastro_loja';       // nova
+  static const String comprarLoja = '/comprar_loja';         // nova
   static const String desaparecido = '/desaparecido';
   static const String cadastroPet = '/cadastro_pet';
   static const String criarDesaparecido = '/criar_desaparecido';
@@ -33,6 +37,11 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       return MaterialPageRoute(builder: (_) => LoginScreen());
     case AppRoutes.loja:
       return MaterialPageRoute(builder: (_) => LojaScreen());
+    case AppRoutes.cadastroLoja:
+      return MaterialPageRoute(builder: (_) => CadastroLojaScreen());
+    case AppRoutes.comprarLoja:
+      final produto = settings.arguments as Map<String, dynamic>;
+      return MaterialPageRoute(builder: (_) => ComprarLojaScreen(produto: produto));
     case AppRoutes.desaparecido:
       return MaterialPageRoute(builder: (_) => DesaparecidoScreen());
     case AppRoutes.cadastroPet:

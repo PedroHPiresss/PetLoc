@@ -1,6 +1,7 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
-import '../navigation/app_routes.dart';
+import '../../navigation/app_routes.dart';
 
 class MenuPetScreen extends StatefulWidget {
   @override
@@ -32,7 +33,7 @@ class _MenuPetScreenState extends State<MenuPetScreen> {
                 'nome': petData['nome'] ?? '',
                 'descricao': petData['descricao'] ?? '',
                 'contato': petData['contato'] ?? '',
-                'imagemPath': petData['imagemPath'] ?? '',
+                'imagemBase64': petData['imagemBase64'] ?? '', // campo atualizado
               };
             }).toList();
 
@@ -40,11 +41,35 @@ class _MenuPetScreenState extends State<MenuPetScreen> {
               itemCount: petsList.length,
               itemBuilder: (context, index) {
                 final pet = petsList[index];
+
+                Widget imagemMiniatura;
+                if (pet['imagemBase64'] != null && pet['imagemBase64'].isNotEmpty) {
+                  try {
+                    imagemMiniatura = CircleAvatar(
+                      radius: 30,
+                      backgroundImage: MemoryImage(
+                        base64Decode(pet['imagemBase64']),
+                      ),
+                      backgroundColor: Colors.transparent,
+                    );
+                  } catch (e) {
+                    imagemMiniatura = CircleAvatar(
+                      radius: 30,
+                      child: Icon(Icons.pets),
+                    );
+                  }
+                } else {
+                  imagemMiniatura = CircleAvatar(
+                    radius: 30,
+                    child: Icon(Icons.pets),
+                  );
+                }
+
                 return Card(
                   margin: EdgeInsets.all(12),
                   elevation: 4,
                   child: ListTile(
-                    leading: Icon(Icons.pets, size: 40),
+                    leading: imagemMiniatura,
                     title: Text(pet['nome']),
                     subtitle: Text(pet['descricao']),
                     trailing: Icon(Icons.arrow_forward),

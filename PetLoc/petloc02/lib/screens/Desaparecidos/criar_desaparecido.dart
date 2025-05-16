@@ -1,8 +1,9 @@
+import 'dart:io';
+import 'dart:convert'; // para base64
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart'; // Para interagir com o Firebase Firestore
-import 'package:image_picker/image_picker.dart'; // Para escolher a imagem da galeria
-import 'dart:io'; // Para usar File
-import '../navigation/app_routes.dart'; // Importando as rotas
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:image_picker/image_picker.dart';
+import '../../navigation/app_routes.dart';
 
 class CriarDesaparecidoScreen extends StatefulWidget {
   @override
@@ -16,35 +17,35 @@ class _CriarDesaparecidoScreenState extends State<CriarDesaparecidoScreen> {
   final _imagePicker = ImagePicker();
   XFile? _imageFile;
 
-  // Função para selecionar uma imagem da galeria
   Future<void> _selectImage() async {
     final pickedFile = await _imagePicker.pickImage(source: ImageSource.gallery);
-    setState(() {
-      if (pickedFile != null) {
+    if (pickedFile != null) {
+      setState(() {
         _imageFile = pickedFile;
-      }
-    });
+      });
+    }
   }
 
-  // Função para salvar os dados no Firebase Firestore
   Future<void> _saveData() async {
-    if (_imageFile != null && _nomeController.text.isNotEmpty && _descricaoController.text.isNotEmpty && _contatoController.text.isNotEmpty) {
+    if (_nomeController.text.isNotEmpty &&
+        _descricaoController.text.isNotEmpty &&
+        _contatoController.text.isNotEmpty) {
       try {
-        // Caso tenha imagem, podemos salvar um caminho local ou uma URL pública.
-        // No caso, estamos assumindo que você já tem uma URL pública da imagem ou pode salvar como caminho local.
-        
-        final imageUrl = _imageFile != null ? _imageFile!.path : ''; // Usando o caminho local da imagem
+        String? base64Image;
 
-        // Salvar os dados no Firebase Firestore
+        if (_imageFile != null) {
+          final bytes = await File(_imageFile!.path).readAsBytes();
+          base64Image = base64Encode(bytes);
+        }
+
         final FirebaseFirestore firestore = FirebaseFirestore.instance;
         await firestore.collection('desaparecidos').add({
           'nome': _nomeController.text,
           'descricao': _descricaoController.text,
           'contato': _contatoController.text,
-          'imagem': imageUrl, // Salvando o caminho da imagem ou URL
+          'imagem': base64Image ?? '', // salva string base64 ou string vazia
         });
 
-        // Limpar os campos após salvar
         _nomeController.clear();
         _descricaoController.clear();
         _contatoController.clear();
@@ -52,16 +53,20 @@ class _CriarDesaparecidoScreenState extends State<CriarDesaparecidoScreen> {
           _imageFile = null;
         });
 
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Animal desaparecido salvo com sucesso!')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Animal desaparecido salvo com sucesso!')),
+        );
 
-        // Opcional: Navegar para a lista de desaparecidos após o sucesso
         Navigator.pushReplacementNamed(context, AppRoutes.desaparecido);
       } catch (error) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Erro ao salvar os dados: $error')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erro ao salvar os dados: $error')),
+        );
       }
     } else {
-      // Caso não tenha imagem ou campos vazios
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Por favor, preencha todos os campos e selecione uma imagem!')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Preencha todos os campos.')),
+      );
     }
   }
 
@@ -80,7 +85,7 @@ class _CriarDesaparecidoScreenState extends State<CriarDesaparecidoScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.menu),
-            onPressed: () {}, // Ainda sem ação
+            onPressed: () {},
           ),
         ],
       ),
@@ -147,14 +152,13 @@ class _CriarDesaparecidoScreenState extends State<CriarDesaparecidoScreen> {
         backgroundColor: Colors.grey,
         selectedItemColor: Colors.black,
         unselectedItemColor: Colors.black,
-        currentIndex: 1, // Índice da aba atual
+        currentIndex: 1,
         onTap: (index) {
           switch (index) {
             case 0:
               Navigator.pushReplacementNamed(context, AppRoutes.home);
               break;
             case 1:
-              // Já está na tela de criar desaparecido
               break;
             case 2:
               Navigator.pushReplacementNamed(context, AppRoutes.loja);

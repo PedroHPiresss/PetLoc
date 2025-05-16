@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:image_picker/image_picker.dart'; // Importar o pacote
 import 'dart:io'; // Para manipular arquivos de imagem
-import '../navigation/app_routes.dart';
+import 'dart:convert'; // Para converter a imagem em base64
+import '../../navigation/app_routes.dart';
 
 class CadastroPetScreen extends StatefulWidget {
   @override
@@ -33,12 +34,18 @@ class _CadastroPetScreenState extends State<CadastroPetScreen> {
     final database = FirebaseDatabase.instance.ref();
     final novoPet = database.child('pets').push(); // /pets/{id}
 
+    String? base64Image;
+    if (_image != null) {
+      final bytes = await _image!.readAsBytes();
+      base64Image = base64Encode(bytes);
+    }
+
     // Enviar dados para o Firebase
     await novoPet.set({
       'nome': _nomeController.text,
       'descricao': _descricaoController.text,
       'contato': _contatoController.text,
-      'imagemPath': _image?.path ?? 'imagem_local.jpg', // Adiciona o caminho da imagem
+      'imagemBase64': base64Image ?? '', // Salva a imagem em base64 no Firebase
     });
 
     ScaffoldMessenger.of(context).showSnackBar(
