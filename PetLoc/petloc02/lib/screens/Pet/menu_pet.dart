@@ -33,11 +33,12 @@ class _MenuPetScreenState extends State<MenuPetScreen> {
                 'nome': petData['nome'] ?? '',
                 'descricao': petData['descricao'] ?? '',
                 'contato': petData['contato'] ?? '',
-                'imagemBase64': petData['imagemBase64'] ?? '', // campo atualizado
+                'imagemBase64': petData['imagemBase64'] ?? '',
               };
             }).toList();
 
             return ListView.builder(
+              padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
               itemCount: petsList.length,
               itemBuilder: (context, index) {
                 final pet = petsList[index];
@@ -45,34 +46,47 @@ class _MenuPetScreenState extends State<MenuPetScreen> {
                 Widget imagemMiniatura;
                 if (pet['imagemBase64'] != null && pet['imagemBase64'].isNotEmpty) {
                   try {
-                    imagemMiniatura = CircleAvatar(
-                      radius: 30,
-                      backgroundImage: MemoryImage(
+                    imagemMiniatura = ClipRRect(
+                      borderRadius: BorderRadius.circular(16),
+                      child: Image.memory(
                         base64Decode(pet['imagemBase64']),
+                        width: 100,
+                        height: 100,
+                        fit: BoxFit.cover,
                       ),
-                      backgroundColor: Colors.transparent,
                     );
                   } catch (e) {
-                    imagemMiniatura = CircleAvatar(
-                      radius: 30,
-                      child: Icon(Icons.pets),
+                    imagemMiniatura = Container(
+                      width: 100,
+                      height: 100,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[300],
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Icon(Icons.pets, size: 50, color: Colors.grey[700]),
                     );
                   }
                 } else {
-                  imagemMiniatura = CircleAvatar(
-                    radius: 30,
-                    child: Icon(Icons.pets),
+                  imagemMiniatura = Container(
+                    width: 100,
+                    height: 100,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[300],
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Icon(Icons.pets, size: 50, color: Colors.grey[700]),
                   );
                 }
 
                 return Card(
-                  margin: EdgeInsets.all(12),
-                  elevation: 4,
-                  child: ListTile(
-                    leading: imagemMiniatura,
-                    title: Text(pet['nome']),
-                    subtitle: Text(pet['descricao']),
-                    trailing: Icon(Icons.arrow_forward),
+                  margin: EdgeInsets.only(bottom: 16),
+                  elevation: 6,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  shadowColor: Colors.blueAccent.withOpacity(0.2),
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(20),
                     onTap: () {
                       Navigator.pushNamed(
                         context,
@@ -80,6 +94,63 @@ class _MenuPetScreenState extends State<MenuPetScreen> {
                         arguments: pet,
                       );
                     },
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Row(
+                        children: [
+                          imagemMiniatura,
+                          SizedBox(width: 20),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  pet['nome'],
+                                  style: TextStyle(
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color.fromARGB(255, 33, 54, 175),
+                                  ),
+                                ),
+                                SizedBox(height: 8),
+                                Text(
+                                  pet['descricao'],
+                                  maxLines: 3,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.grey[700],
+                                  ),
+                                ),
+                                SizedBox(height: 12),
+                                Row(
+                                  children: [
+                                    Icon(Icons.contact_phone, size: 16, color: Colors.blue),
+                                    SizedBox(width: 6),
+                                    Expanded(
+                                      child: Text(
+                                        pet['contato'],
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.blue[700],
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                          Icon(
+                            Icons.arrow_forward_ios,
+                            color: Colors.blueAccent,
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 );
               },

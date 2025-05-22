@@ -21,10 +21,14 @@ class _CadastroUsuarioScreenState extends State<CadastroUsuarioScreen> {
     });
 
     try {
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      UserCredential cred = await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _senhaController.text.trim(),
       );
+
+      // Atualiza o displayName do usuário com o nome digitado
+      await cred.user?.updateDisplayName(_nomeController.text.trim());
+      await cred.user?.reload();
 
       // Navega para a tela principal após o cadastro
       Navigator.pushReplacementNamed(context, AppRoutes.home);

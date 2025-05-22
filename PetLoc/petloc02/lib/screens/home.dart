@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_auth/firebase_auth.dart';  // Import necessário
 import '../navigation/app_routes.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -12,29 +13,33 @@ class _HomeScreenState extends State<HomeScreen> {
   final DatabaseReference _petsRef = FirebaseDatabase.instance.ref('pets');
   List<Map<String, dynamic>> _pets = [];
 
+  String _nomeUsuario = 'Visitante';  // Nome padrão antes do login
+
   @override
   void initState() {
     super.initState();
     _carregarPets();
+    _carregarNomeUsuario();
   }
 
   void _carregarPets() {
     _petsRef.onValue.listen((event) {
       final data = event.snapshot.value;
-      if (data != null) {
-        final petsMap = Map<String, dynamic>.from(data as Map);
+      if (data != null && data is Map) {
+        final petsMap = Map<String, dynamic>.from(data);
         final petsList = petsMap.entries.map((entry) {
-          final petData = Map<String, dynamic>.from(entry.value);
+          final petData = entry.value is Map
+              ? Map<String, dynamic>.from(entry.value)
+              : <String, dynamic>{};
           return {
             'id': entry.key,
             'nome': petData['nome'] ?? '',
             'descricao': petData['descricao'] ?? '',
             'contato': petData['contato'] ?? '',
-            'imagemPath': petData['imagemPath'] ?? '',
+            'imagemBase64': petData['imagemBase64'] ?? '',
           };
         }).toList();
 
-        // Limitar a 4 pets para exibir
         setState(() {
           _pets = petsList.take(4).toList();
         });
@@ -42,6 +47,20 @@ class _HomeScreenState extends State<HomeScreen> {
         setState(() {
           _pets = [];
         });
+      }
+    });
+  }
+
+  void _carregarNomeUsuario() {
+    final user = FirebaseAuth.instance.currentUser;
+    setState(() {
+      if (user != null && user.displayName != null && user.displayName!.isNotEmpty) {
+        _nomeUsuario = user.displayName!;
+      } else if (user != null && user.email != null) {
+        // Se o nome não estiver setado, mostrar parte do email como fallback
+        _nomeUsuario = user.email!.split('@')[0];
+      } else {
+        _nomeUsuario = 'Visitante';
       }
     });
   }
@@ -62,8 +81,9 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: Column(
         children: [
-          // Faixa azul fixa
+          // Faixa azul fixa com nome e miniaturas
           Container(
+            width: double.infinity,
             padding: EdgeInsets.all(20),
             decoration: BoxDecoration(
               color: Colors.blueAccent,
@@ -73,7 +93,7 @@ class _HomeScreenState extends State<HomeScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Olá Visitante',
+                  'Olá $_nomeUsuario',
                   style: TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
@@ -86,7 +106,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 SizedBox(height: 30),
 
-                // Linha horizontal com as miniaturas dos pets + botão adicionar
+                // Linha com botão + pets
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: Row(
@@ -99,31 +119,24 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: CircleAvatar(
                           backgroundColor: Colors.white,
                           radius: 40,
-                          child: Icon(
-                            Icons.add,
-                            color: Colors.blueAccent,
-                            size: 40,
-                          ),
+                          child: Icon(Icons.add, color: Colors.blueAccent, size: 40),
                         ),
                       ),
-
                       SizedBox(width: 20),
 
-                      // Miniaturas dos pets cadastrados
+                      // Miniaturas dos pets cadastrados com navegação para detalhes
                       ..._pets.map((pet) {
-                        // Decodifica a imagem base64
-                        final String base64Str = pet['imagemPath'] ?? '';
+                        final dynamic base64Data = pet['imagemBase64'];
                         Widget avatar;
 
-                        if (base64Str.isNotEmpty) {
+                        if (base64Data != null && base64Data is String && base64Data.isNotEmpty) {
                           try {
-                            final decodedBytes = base64Decode(base64Str);
+                            final decodedBytes = base64Decode(base64Data);
                             avatar = CircleAvatar(
                               radius: 40,
                               backgroundImage: MemoryImage(decodedBytes),
                             );
-                          } catch (e) {
-                            // Se falhar no decode, exibe um ícone padrão
+                          } catch (_) {
                             avatar = CircleAvatar(
                               radius: 40,
                               child: Icon(Icons.pets, size: 40),
@@ -140,7 +153,16 @@ class _HomeScreenState extends State<HomeScreen> {
                           padding: const EdgeInsets.symmetric(horizontal: 10),
                           child: Column(
                             children: [
-                              avatar,
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.pushNamed(
+                                    context,
+                                    AppRoutes.verPet,
+                                    arguments: pet,
+                                  );
+                                },
+                                child: avatar,
+                              ),
                               SizedBox(height: 6),
                               SizedBox(
                                 width: 80,
@@ -164,6 +186,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
           SizedBox(height: 50),
 
+          // Grade com botões de navegação
           Expanded(
             child: GridView.count(
               crossAxisCount: 2,
@@ -206,6 +229,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
+
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Colors.grey,
         selectedItemColor: Colors.black,
@@ -213,9 +237,6 @@ class _HomeScreenState extends State<HomeScreen> {
         currentIndex: 0,
         onTap: (index) {
           switch (index) {
-            case 0:
-              // Já na home
-              break;
             case 1:
               Navigator.pushReplacementNamed(context, AppRoutes.criarDesaparecido);
               break;

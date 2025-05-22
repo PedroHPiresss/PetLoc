@@ -48,20 +48,39 @@ class _DesaparecidoScreenState extends State<DesaparecidoScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFF2F7FF),
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(255, 92, 151, 253),
         title: Row(
           children: [
             Image.asset('assets/logo2.png', height: 40),
-            const SizedBox(width: 10),
-            const Text('PET LOC'),
+            const SizedBox(width: 12),
+            const Text(
+              'PET LOC',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 22,
+                letterSpacing: 1.2,
+              ),
+            ),
           ],
         ),
+        elevation: 6,
+        shadowColor: Colors.blue.shade200,
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
         child: _desaparecidos.isEmpty
-            ? const Center(child: Text("Nenhum desaparecido encontrado"))
+            ? Center(
+                child: Text(
+                  "Nenhum desaparecido encontrado",
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: Colors.blueGrey.shade700,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              )
             : ListView.builder(
                 itemCount: _desaparecidos.length,
                 itemBuilder: (context, index) {
@@ -106,7 +125,8 @@ class _DesaparecidoScreenState extends State<DesaparecidoScreen> {
     );
   }
 
-  Widget _buildDesaparecidoCard(String id, String? imagemBase64, String nome, String descricao, String contato) {
+  Widget _buildDesaparecidoCard(
+      String id, String? imagemBase64, String nome, String descricao, String contato) {
     Widget imageWidget;
 
     if (imagemBase64 != null && imagemBase64.isNotEmpty) {
@@ -149,16 +169,24 @@ class _DesaparecidoScreenState extends State<DesaparecidoScreen> {
                   children: [
                     Text(
                       nome,
-                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 33, 54, 175)),
                     ),
                     const SizedBox(height: 6),
                     Text(descricao),
                     const SizedBox(height: 10),
                     Row(
                       children: [
-                        const Icon(Icons.phone, size: 18, color: Colors.blueAccent),
+                        const Icon(Icons.phone, size: 18, color: Color.fromARGB(255, 92, 151, 253)),
                         const SizedBox(width: 6),
-                        Text(contato),
+                        Expanded(
+                          child: Text(
+                            contato,
+                            style: TextStyle(
+                              color: Colors.blue.shade800,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ],
